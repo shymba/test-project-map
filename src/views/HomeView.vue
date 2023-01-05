@@ -21,15 +21,19 @@
       >
         {{pageNum}}
       </div>
-    </div>  </div>
+    </div>
+    <MyChart/>
+  </div>
 </template>
 
 <script>
 import PostsList from "@/components/PostsList";
 import axios from 'axios';
 import MySelect from "@/components/MySelect";
+import MyChart from "@/components/MyChart";
+
 export default {
-  components: {MySelect, PostsList},
+  components: {MySelect, PostsList, MyChart},
   data() {
     return {
       posts: [],

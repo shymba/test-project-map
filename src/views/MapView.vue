@@ -31,7 +31,6 @@ export default {
       let myIcon;
 
       function onMapClick(e) {
-        // console.log(e.latlng.toString())
         const markerGeo = {
           lat: e.latlng.lat,
           lng: e.latlng.lng
