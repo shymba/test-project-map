@@ -28,15 +28,20 @@ export default {
 
       let popup = leaflet.popup();
       let marker;
-      let myIcon;
+      // let myIcon;
 
       function onMapClick(e) {
         const markerGeo = {
           lat: e.latlng.lat,
           lng: e.latlng.lng
         }
-        marker = leaflet.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
-        // console.log(markerGeo)
+        marker = leaflet.marker([e.latlng.lat, e.latlng.lng], {title: e.latlng})
+                        .addTo(map);
+
+        marker.on('mouseover', () => {
+          marker.openPopup();
+        });
+
         markers.push(markerGeo)
         popup
             .setLatLng(e.latlng)
