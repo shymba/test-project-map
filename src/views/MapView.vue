@@ -8,12 +8,16 @@
 
 <script>
 import leaflet from 'leaflet';
-import {onMounted} from "vue";
+import {onMounted, ref} from "vue";
 
 export default {
   name: 'MapView',
   setup() {
     let map;
+    const localStorageMarkers = JSON.parse(localStorage.getItem('markers'));
+
+    let markers = localStorage.getItem('markers') !== null ? localStorageMarkers : [];
+
     onMounted(() => {
 
       map = leaflet.map('map').setView([48.379433, 31.1655799], 5.5)
@@ -22,14 +26,43 @@ export default {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(map);
 
-      let marker = leaflet.marker([48.379433, 31.1655799]).addTo(map);
-      let circle = leaflet.circle([48.379433, 31.1655799], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 11500
-      }).addTo(map);
+      let popup = leaflet.popup();
+      let marker;
+      let myIcon;
+
+      function onMapClick(e) {
+        // console.log(e.latlng.toString())
+        const markerGeo = {
+          lat: e.latlng.lat,
+          lng: e.latlng.lng
+        }
+        marker = leaflet.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+        // console.log(markerGeo)
+        markers.push(markerGeo)
+        popup
+            .setLatLng(e.latlng)
+            .setContent("You clicked the map at " + e.latlng.toString())
+            .openOn(map);
+
+        updateLocalStorage()
+      }
+
+      //update local storage
+      function updateLocalStorage() {
+        localStorage.setItem('markers', JSON.stringify(markers))
+      }
+      //add markers from local storage
+      function addMarkers(m) {
+        m.forEach((el) => {
+          leaflet.marker([el.lat, el.lng]).addTo(map)
+        })
+      }
+
+      addMarkers(markers)
+
+      map.on('click', onMapClick);
     })
+
   },
 }
 </script>
