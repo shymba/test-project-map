@@ -4,19 +4,36 @@
       <div id="map"></div>
     </div>
   </div>
+  <div>
+    <MyModal
+        @closeModal="closeModalWindow"
+        v-if="showModal"
+        :coordsInfo="coordsInfo"
+    />
+  </div>
 </template>
 
 <script>
 import leaflet from 'leaflet';
 import {onMounted, ref} from "vue";
+import MyModal from "@/components/MyModal";
 
 export default {
   name: 'MapView',
+  components: {MyModal},
   setup() {
     let map;
     const localStorageMarkers = JSON.parse(localStorage.getItem('markers'));
-
     let markers = localStorage.getItem('markers') !== null ? localStorageMarkers : [];
+
+    const coordsInfo = ref(null)
+    const showModal = ref(null)
+    const nameInput = ref(null)
+
+    const closeModalWindow = (el) => {
+      showModal.value = null;
+      nameInput.value = el;
+    }
 
     onMounted(() => {
 
@@ -28,13 +45,13 @@ export default {
 
       let popup = leaflet.popup();
       let marker;
-      // let myIcon;
 
       function onMapClick(e) {
         const markerGeo = {
           lat: e.latlng.lat,
-          lng: e.latlng.lng
+          lng: e.latlng.lng,
         }
+
         marker = leaflet.marker([e.latlng.lat, e.latlng.lng], {title: e.latlng})
                         .addTo(map);
 
@@ -47,8 +64,9 @@ export default {
             .setLatLng(e.latlng)
             .setContent("You clicked the map at " + e.latlng.toString())
             .openOn(map);
-
-        updateLocalStorage()
+        coordsInfo.value = markerGeo;
+        updateLocalStorage();
+        showModal.value = true;
       }
 
       //update local storage
@@ -67,6 +85,7 @@ export default {
       map.on('click', onMapClick);
     })
 
+    return {showModal, coordsInfo, closeModalWindow };
   },
 }
 </script>
